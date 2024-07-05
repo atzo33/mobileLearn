@@ -1,6 +1,7 @@
 package com.example.kolokvijum_1;
 
-import android.content.pm.PackageManager;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,11 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.Manifest;
-import android.widget.Toast;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.kolokvijum_1.Utils.FragmentTransition;
@@ -21,20 +18,18 @@ import com.example.kolokvijum_1.database.SQLiteHelper;
 
 import java.util.List;
 
-public class KomentariFragment extends Fragment {
+public class MojiKomentariFragment extends Fragment {
     private ListView listView;
     private SQLiteHelper sqLiteHelper;
     private Button dodajButton;
     private Button myComments;
-    private Button camAllow;
-    private static final int REQUEST_CAMERA_PERMISSION = 1;
 
-    public KomentariFragment() {
+    public MojiKomentariFragment() {
         // Required empty public constructor
     }
 
-    public static KomentariFragment newInstance() {
-        return new KomentariFragment();
+    public static MojiKomentariFragment newInstance() {
+        return new MojiKomentariFragment();
     }
 
     @Override
@@ -68,43 +63,20 @@ public class KomentariFragment extends Fragment {
         });
 
         myComments = view.findViewById(R.id.myComments);
-        myComments.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                myComments.setBackgroundColor(Color.RED);
-                // Transition to NoviKomentarFragment
-                FragmentTransition.to(MojiKomentariFragment.newInstance(), getActivity(), true, R.id.fragmentContainerView);
-            }
-        });
-
-        camAllow = view.findViewById(R.id.camAllow);
-        camAllow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    // Request the CAMERA permission
-                    ActivityCompat.requestPermissions(getActivity(),
-                            new String[]{Manifest.permission.CAMERA},
-                            REQUEST_CAMERA_PERMISSION);
-                } else {
-                    // Permission has already been granted, you can proceed with the camera functionality
-                    Toast.makeText(getActivity(), "Already granted", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        });
-
+        myComments.setBackgroundColor(Color.RED);
         loadComments();
         return view;
     }
 
     private void loadComments() {
+
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MySharedPref", Context.MODE_PRIVATE);
+        String username = sharedPreferences.getString("username_shared", "default_username");
         if (getContext() != null) {
-            List<String> comments = sqLiteHelper.getAllComments();
+            List<String> comments = sqLiteHelper.getCommentsByUser(username);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, comments);
             listView.setAdapter(adapter);
         }
     }
+
 }

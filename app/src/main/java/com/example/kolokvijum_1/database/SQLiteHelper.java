@@ -131,6 +131,15 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return comments;
     }
 
+    public void insertComment(String username, String comment) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_USER_NAME, username);
+        values.put(KEY_COMMENT, comment);
+        db.insert(TABLE_COMMENTS, null, values);
+        db.close();
+    }
+
 
 
 }

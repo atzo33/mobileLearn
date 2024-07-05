@@ -1,6 +1,8 @@
 package com.example.kolokvijum_1;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText usernameEditText;
     private EditText passwordEditText;
     private Button loginButton;
+    static final String PREFS_NAME = "MyPrefs";
+    static final String KEY_USERNAME_SHARED = "username";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +46,15 @@ public class MainActivity extends AppCompatActivity {
 
             // Process the login inside the button click listener
             if (sqLiteHelper.checkUserExists(username, password)) {
+
+                SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                editor.putString("username_shared", username);
+                editor.apply();
+                System.out.println("EDITOR JE"+ sharedPreferences.getString("username_shared","LOS STRING"));
+
+
                 // User exists, handle login success
                 Toast.makeText(MainActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, BaseActivity.class);
